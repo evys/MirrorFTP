@@ -1,0 +1,7 @@
+ftp.xpg.com.br
+21
+60
+sd0907
+teste01
+/local/
+/local/
