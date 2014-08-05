@@ -14,14 +14,15 @@ import java.util.StringTokenizer;
  * @author Andre
  */
 public class Main {
-public String tipo;
-public int naosei;
+/*public String tipo;
+public String naosei;
 public String server;
-public int tamanho;
+public String ftp;
+public String tamanho;
 public String mes;
-public int dia;
+public String dia;
 public String hora;
-public String nomeArq;
+public String nomeArq;*/
     /**
      * @param args the command line arguments
      */
@@ -40,19 +41,34 @@ public String nomeArq;
         ComandosFTP cl = new ComandosFTP();
         cl.connect(host, porta);
         cl.login(usuario, senha);
-        
+        //cl.delete("E:\\Aula 09-07\\teste.txt");
         //cl.send (dirLocal+"tst.txt");
         //cl.receive(dirLocal,"tst.txt");
-    
+    /*
         ArrayList <String> arqui  = new ArrayList<String> ();
         
         //arqui.add = 
         arqui=cl.list(arqui,"/");
-        StringTokenizer parser = new StringTokenizer(astring);
-    while (parser.hasMoreTokens()) {€
-        processWord(parser.nextToken());
-    }
-
+        
+  ArrayList <String> nome  = new ArrayList<String> ();
+  
+   StringTokenizer parser = new StringTokenizer(arqui.get(0), " ");
+    while (parser.hasMoreTokens()) {
+        
+        nome.add ( parser.nextToken(" "));
+        m1.naosei = parser.nextToken();
+        m1.server = parser.nextToken();
+        m1.ftp = parser.nextToken();
+        m1.tamanho= parser.nextToken();
+        m1.mes = parser.nextToken();
+        m1.dia = parser.nextToken();
+        m1.hora = parser.nextToken();
+        m1.nomeArq = parser.nextToken();
+        
+        
+          }
+    
+    System.out.println (nome);*/
 
         
     }

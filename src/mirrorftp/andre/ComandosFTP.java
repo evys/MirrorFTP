@@ -128,7 +128,13 @@ public class ComandosFTP {
         while ((umByte = isDados.read()) != -1) {
             fos.write(umByte);
         }
-
     }
+public void delete(String arq) throws IOException {  //mandar arquivo
+        
+        String msg = "DELE " + arq + "\r\n";
+        this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
+        this.getCntrlResp();
+       
+}
 
 }
