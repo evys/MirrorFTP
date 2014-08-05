@@ -14,18 +14,46 @@ import java.util.StringTokenizer;
  * @author Andre
  */
 public class Main {
-/*public String tipo;
-public String naosei;
-public String server;
-public String ftp;
-public String tamanho;
-public String mes;
-public String dia;
-public String hora;
-public String nomeArq;*/
+
+    public String tipo;
+    public String naosei;
+    public String server;
+    public String ftp;
+    public String tamanho;
+    public String mes;
+    public String dia;
+    public String hora;
+    public String nomeArq;
+
     /**
      * @param args the command line arguments
+     * @throws java.io.IOException
      */
+    public static ArrayList<Main> getData(ArrayList<String> resp) {
+        ArrayList<Main> dadosArq = new ArrayList<>();
+
+        for (String linha : resp) {
+            ArrayList<String> aux = new ArrayList<>();
+            StringTokenizer parser = new StringTokenizer(linha, "   ");
+            while (parser.hasMoreTokens()) {
+                aux.add(parser.nextToken());
+            }
+            Main m1 = new Main();
+            m1.tipo = aux.get(0);
+            m1.naosei = aux.get(1);
+            m1.server = aux.get(2);
+            m1.ftp = aux.get(3);
+            m1.tamanho = aux.get(4);
+            m1.mes = aux.get(5);
+            m1.dia = aux.get(6);
+            m1.hora = aux.get(7);
+            m1.nomeArq = aux.get(8);
+            // System.out.println (aux);
+            dadosArq.add(m1);
+        }
+        return dadosArq;
+    }
+
     public static void main(String[] args) throws IOException {
         File f = new File("entradas.txt");
         InputStream is = new FileInputStream(f);
@@ -42,34 +70,16 @@ public String nomeArq;*/
         cl.connect(host, porta);
         cl.login(usuario, senha);
         //cl.delete("E:\\Aula 09-07\\teste.txt");
-        //cl.send (dirLocal+"tst.txt");
+        //cl.send (dirLocal, "tst.txt");
         //cl.receive(dirLocal,"tst.txt");
-    /*
-        ArrayList <String> arqui  = new ArrayList<String> ();
-        
-        //arqui.add = 
-        arqui=cl.list(arqui,"/");
-        
-  ArrayList <String> nome  = new ArrayList<String> ();
-  
-   StringTokenizer parser = new StringTokenizer(arqui.get(0), " ");
-    while (parser.hasMoreTokens()) {
-        
-        nome.add ( parser.nextToken(" "));
-        m1.naosei = parser.nextToken();
-        m1.server = parser.nextToken();
-        m1.ftp = parser.nextToken();
-        m1.tamanho= parser.nextToken();
-        m1.mes = parser.nextToken();
-        m1.dia = parser.nextToken();
-        m1.hora = parser.nextToken();
-        m1.nomeArq = parser.nextToken();
-        
-        
-          }
-    
-    System.out.println (nome);*/
 
-        
+        ArrayList<String> resp = new ArrayList<>();
+
+        resp = cl.list(resp, "/");
+ArrayList<Main> dadosArq = getData(resp);
+        for (Main dadosArq1 : dadosArq) {
+            System.out.println(dadosArq1.nomeArq);
+        }
+
     }
 }

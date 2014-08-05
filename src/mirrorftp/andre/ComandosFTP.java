@@ -98,18 +98,18 @@ public class ComandosFTP {
         while ((line = br.readLine()) != null) {
             lista.add(line);
             //resp = resp + "\n" + line;
-            System.out.println (line);
-            }
+            System.out.println(line);
+        }
         return lista;
     }
 
-    public void send(String arq) throws IOException {  //mandar arquivo
+    public void send(String dir, String arq) throws IOException {  //mandar arquivo
         this.pasv();
         String msg = "STOR " + arq + "\r\n";
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         this.getCntrlResp();
 
-         FileInputStream fos = new FileInputStream(arq);
+        FileInputStream fos = new FileInputStream(dir + arq);
         int umByte = 0;
         while ((umByte = fos.read()) != -1) {
             osDados.write(umByte);
@@ -123,18 +123,20 @@ public class ComandosFTP {
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         this.getCntrlResp();
 
-        FileOutputStream fos = new FileOutputStream(pasta+arq);
+        FileOutputStream fos = new FileOutputStream(pasta + arq);
         int umByte = 0;
         while ((umByte = isDados.read()) != -1) {
             fos.write(umByte);
         }
     }
-public void delete(String arq) throws IOException {  //mandar arquivo
-        
+
+    public void delete(String arq) throws IOException {  //mandar arquivo
         String msg = "DELE " + arq + "\r\n";
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         this.getCntrlResp();
-       
-}
+
+    }
+    
+    
 
 }
