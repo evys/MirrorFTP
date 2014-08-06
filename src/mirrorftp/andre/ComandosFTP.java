@@ -100,6 +100,10 @@ public class ComandosFTP {
             //resp = resp + "\n" + line;
             System.out.println(line);
         }
+        osDados.flush();
+        osDados.close();
+        isDados.close();
+        this.getCntrlResp();
         return lista;
     }
 
@@ -114,7 +118,10 @@ public class ComandosFTP {
         while ((umByte = fos.read()) != -1) {
             osDados.write(umByte);
         }
-
+        osDados.flush();
+        osDados.close();
+        isDados.close();
+        this.getCntrlResp();
     }
 
     public void receive(String pasta, String arq) throws IOException {  //mandar arquivo
@@ -128,6 +135,10 @@ public class ComandosFTP {
         while ((umByte = isDados.read()) != -1) {
             fos.write(umByte);
         }
+        osDados.flush();
+        osDados.close();
+        isDados.close();
+        this.getCntrlResp();
     }
 
     public void delete(String arq) throws IOException {  //mandar arquivo
@@ -136,7 +147,5 @@ public class ComandosFTP {
         this.getCntrlResp();
 
     }
-    
-    
 
 }

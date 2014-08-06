@@ -6,8 +6,8 @@
 package mirrorftp.andre;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
+import java.util.*;
+
 
 /**
  *
@@ -26,8 +26,8 @@ public class Main {
     public String nomeArq;
 
     /**
-     * @param args the command line arguments
-     * @throws java.io.IOException
+     * @param resp
+     * @return
      */
     public static ArrayList<Main> getData(ArrayList<String> resp) {
         ArrayList<Main> dadosArq = new ArrayList<>();
@@ -69,17 +69,43 @@ public class Main {
         ComandosFTP cl = new ComandosFTP();
         cl.connect(host, porta);
         cl.login(usuario, senha);
-        //cl.delete("E:\\Aula 09-07\\teste.txt");
+    
         //cl.send (dirLocal, "tst.txt");
         //cl.receive(dirLocal,"tst.txt");
 
         ArrayList<String> resp = new ArrayList<>();
-
         resp = cl.list(resp, "/");
-ArrayList<Main> dadosArq = getData(resp);
-        for (Main dadosArq1 : dadosArq) {
-            System.out.println(dadosArq1.nomeArq);
+        ArrayList<Main> dadosArq = getData(resp);
+                
+        
+        File diretorio = new File(dirLocal); 
+        File fList[] = diretorio.listFiles(); 
+        ArrayList<String> files = new ArrayList <>(); //só pra poder usar metodo contains
+        
+         for (File fList1 : fList) {
+            //System.out.println(fList1.getName() + " " + new Date(fList1.lastModified()));
+             files.add(fList1.getName());
         }
+  
+        for (Main dadosArq1 : dadosArq) {
+            //System.out.println("Nome do item: " +dadosArq1.nomeArq);
+        
+          if (files.contains(dadosArq1.nomeArq)){
+            //  System.out.println("contém");
+                        }
+          else{
+             cl.receive(dirLocal,dadosArq1.nomeArq);}
+             }
+        }
+/*String dir = dirLocal; 
 
+File diretorio = new File(dir); 
+File fList[] = diretorio.listFiles(); 
+
+        for (File fList1 : fList) {
+            System.out.println(fList1.getName() + " " + new Date(fList1.lastModified()));
+            
+            
+        }*/
     }
-}
+
