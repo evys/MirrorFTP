@@ -8,7 +8,6 @@ package mirrorftp.andre;
 import java.io.*;
 import java.util.*;
 
-
 /**
  *
  * @author Andre
@@ -29,7 +28,7 @@ public class Main {
      * @param resp
      * @return
      */
-    public static ArrayList<Main> getData(ArrayList<String> resp) {
+    public static ArrayList<Main> getDados(ArrayList<String> resp) {
         ArrayList<Main> dadosArq = new ArrayList<>();
 
         for (String linha : resp) {
@@ -53,7 +52,45 @@ public class Main {
         }
         return dadosArq;
     }
+    private String dirLocal;
+    
+public static void sincroniza (ComandosFTP cl, String dirLocal) throws IOException{
+    ArrayList<String> resp = new ArrayList<>();
+        resp = cl.list(resp, "/");
+        ArrayList<Main> dadosArq = getDados(resp);
 
+        File diretorio = new File(dirLocal);
+        File fList[] = diretorio.listFiles();
+        ArrayList<String> files = new ArrayList<>(); //só pra poder usar metodo contains
+
+        for (File fList1 : fList) {
+            //System.out.println(fList1.getName() + " " + new Date(fList1.lastModified()));
+            files.add(fList1.getName());
+        }
+//sincroniza local de acordo com remoto
+        for (Main dadosArq1 : dadosArq) {
+            //System.out.println("Nome do item: " +dadosArq1.nomeArq);
+            if (files.contains(dadosArq1.nomeArq)) {
+                //  System.out.println("contém");
+            } else {
+                cl.receive(dirLocal, dadosArq1.nomeArq);
+            }
+        }
+
+        ArrayList<String> auxRemoto = new ArrayList<>();
+        for (Main m2 : dadosArq) {
+            auxRemoto.add(m2.nomeArq);
+        }
+        //sincroniza remoto de acordo com local
+        for (String nome : files) {
+            //System.out.println("Nome do item: " +dadosArq1.nomeArq);
+            if (auxRemoto.contains(nome)) {
+                //  System.out.println("contém");
+            } else {
+                cl.send(dirLocal, nome);
+            }
+        }
+}
     public static void main(String[] args) throws IOException {
         File f = new File("entradas.txt");
         InputStream is = new FileInputStream(f);
@@ -69,43 +106,9 @@ public class Main {
         ComandosFTP cl = new ComandosFTP();
         cl.connect(host, porta);
         cl.login(usuario, senha);
-    
-        //cl.send (dirLocal, "tst.txt");
-        //cl.receive(dirLocal,"tst.txt");
-
-        ArrayList<String> resp = new ArrayList<>();
-        resp = cl.list(resp, "/");
-        ArrayList<Main> dadosArq = getData(resp);
-                
+       
+        sincroniza (cl, dirLocal);
         
-        File diretorio = new File(dirLocal); 
-        File fList[] = diretorio.listFiles(); 
-        ArrayList<String> files = new ArrayList <>(); //só pra poder usar metodo contains
-        
-         for (File fList1 : fList) {
-            //System.out.println(fList1.getName() + " " + new Date(fList1.lastModified()));
-             files.add(fList1.getName());
-        }
-  
-        for (Main dadosArq1 : dadosArq) {
-            //System.out.println("Nome do item: " +dadosArq1.nomeArq);
-        
-          if (files.contains(dadosArq1.nomeArq)){
-            //  System.out.println("contém");
-                        }
-          else{
-             cl.receive(dirLocal,dadosArq1.nomeArq);}
-             }
-        }
-/*String dir = dirLocal; 
-
-File diretorio = new File(dir); 
-File fList[] = diretorio.listFiles(); 
-
-        for (File fList1 : fList) {
-            System.out.println(fList1.getName() + " " + new Date(fList1.lastModified()));
-            
-            
-        }*/
     }
 
+}
