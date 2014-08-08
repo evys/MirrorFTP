@@ -148,4 +148,11 @@ public class ComandosFTP {
 
     }
 
+    public String modificationTime(String arq) throws IOException {  //mandar arquivo
+        this.pasv();
+        String msg = "MDTM " + arq + "\r\n";
+        this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
+        String resp = this.getCntrlResp();
+        return resp;
+    }
 }
