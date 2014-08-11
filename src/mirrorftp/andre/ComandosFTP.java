@@ -5,8 +5,14 @@
 package mirrorftp.andre;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.StringTokenizer;
 
 /**
@@ -26,7 +32,7 @@ public class ComandosFTP {
     private String getCntrlResp() throws IOException {  //metodo de captura de resposta
         BufferedReader br = new BufferedReader(new InputStreamReader(this.isContr));//ajuda a encontrar o /n
         String resp = br.readLine(); //devolve os bytes de string ate achar /n
-        System.out.println("Resposta: " + resp);
+        System.out.println(resp);
         return resp;
     }
 
@@ -123,17 +129,51 @@ public class ComandosFTP {
         isDados.close();
         this.getCntrlResp();
     }
+    /*
+     public void receive(String pasta, String arq) throws IOException, ParseException {  //mandar arquivo
+     this.pasv();
+     String msg = "RETR " + arq + "\r\n";
+     this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
+     this.getCntrlResp();
 
-    public void receive(String pasta, String arq) throws IOException {  //mandar arquivo
+     FileOutputStream fos = new FileOutputStream(pasta + arq);
+     int umByte = 0;
+     while ((umByte = isDados.read()) != -1) {
+     fos.write(umByte);
+     }
+      
+     osDados.flush();
+     osDados.close();
+     isDados.close();
+     this.getCntrlResp();
+     //DateFormat df = new SimpleDateFormat("YYYYMMDDhhmmss");
+     //long  x =  20140807162527;
+     //String time = df.format(new Date(x));
+     File fi = new File("/local/tst.txt");
+     String time = this.modificationTime(arq).replace("213 ", "");  
+     //String time ="201401010820";
+        
+     java.text.SimpleDateFormat format = new java.text.SimpleDateFormat("yyyymmddhhmmss"); 
+     java.util.Date data = format.parse(time); 
+     long millis = data.getTime(); 
+     //System.out.println(millis);
+     //long y = Long.parseLong(time);
+     //long xis = 20140101082030L;
+     System.out.println(time);
+     fi.setLastModified(millis);
+     }*/
+
+    public void receive(String pasta, String arq) throws IOException, ParseException {  //mandar arquivo
         this.pasv();
         String msg = "RETR " + arq + "\r\n";
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         this.getCntrlResp();
+        osDados = (new FileOutputStream(new File(pasta + arq)));
 
-        FileOutputStream fos = new FileOutputStream(pasta + arq);
-        int umByte = 0;
-        while ((umByte = isDados.read()) != -1) {
-            fos.write(umByte);
+        byte[] buffer = new byte[4096];
+        int byr = 0;
+        while ((byr = isDados.read(buffer)) != -1) {
+            osDados.write(buffer, 0, byr);
         }
         osDados.flush();
         osDados.close();
@@ -149,7 +189,6 @@ public class ComandosFTP {
     }
 
     public String modificationTime(String arq) throws IOException {  //mandar arquivo
-        this.pasv();
         String msg = "MDTM " + arq + "\r\n";
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         String resp = this.getCntrlResp();
