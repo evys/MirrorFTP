@@ -6,9 +6,7 @@
 package mirrorftp.andre;
 
 import java.io.*;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -37,7 +35,7 @@ public class Main {
         //sincroniza remoto de acordo com local
         for (String aux : auxLocal) {
             if (auxRemoto.contains(aux)) {
-                if (comparaData(dirLocal, aux, cl) == 1) {
+                if (Local.comparaData(dirLocal, aux, cl) == 1) {
                     cl.send(dirLocal, aux);
                 }
             } else {
@@ -48,50 +46,19 @@ public class Main {
 //sincroniza local de acordo com remoto
         for (String dadosArq1 : auxRemoto) {
             if (auxLocal.contains(dadosArq1)) {
-                if (comparaData(dirLocal, dadosArq1, cl) == 2) {
+                if (Local.comparaData(dirLocal, dadosArq1, cl) == 2) {
                     cl.receive(dirLocal, dadosArq1);
-                    mudaData(dirLocal, dadosArq1, cl);  //tentar unir os 2 laços
+                    Local.mudaData(dirLocal, dadosArq1, cl);  //tentar unir os 2 laços
                 }
             } else {
                 cl.receive(dirLocal, dadosArq1);
-                mudaData(dirLocal, dadosArq1, cl);
+                Local.mudaData(dirLocal, dadosArq1, cl);
             }
         }
 
     }
 
-    public static void mudaData(String pasta, String arq, ComandosFTP cl) throws ParseException, IOException {
-        File fi = new File(pasta + arq);
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmSS");
-        String dat = cl.modificationTime(arq).replace("213 ", "");
-        java.util.Date data = sdf.parse(dat);
-
-        long x = data.getTime();
-        fi.setLastModified(x);
-    }
-
-    public static int comparaData(String pasta, String arq, ComandosFTP cl) throws IOException {
-        File f = new File(pasta + arq);
-        String aux = cl.modificationTime(arq).replace("213 ", "");
-        long remoto = Long.parseLong(aux);
-
-        DateFormat formatData = new SimpleDateFormat("yyyyMMddHHmmSS");
-        String data = formatData.format(new Date(f.lastModified()));
-        long local = Long.parseLong(data);
-        int resp = -1;
-        if (local == remoto) {
-            resp = 0;
-        }
-        if (local > remoto) {
-            resp = 1;
-        }
-        if (local < remoto) {
-            resp = 2;
-        }
-        return resp;
-    }
-
+   
     static int indentLevel = -1;
 
     public static void listPath(File path) {
