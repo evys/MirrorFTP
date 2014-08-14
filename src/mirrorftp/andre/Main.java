@@ -17,85 +17,47 @@ import java.util.*;
  */
 public class Main {
 
-    public String tipo;
-    public String naosei;
-    public String server;
-    public String ftp;
-    public String tamanho;
-    public String mes;
-    public String dia;
-    public String hora;
-    public String nomeArq;
-
-    /**
-     * @param resp
-     * @return
-     */
-    public static ArrayList<Main> getDados(ArrayList<String> resp) {
-        ArrayList<Main> dadosArq = new ArrayList<>();
-
-        for (String linha : resp) {
-            ArrayList<String> aux = new ArrayList<>();
-            StringTokenizer parser = new StringTokenizer(linha, "   ");
-            while (parser.hasMoreTokens()) {
-                aux.add(parser.nextToken());
-            }
-            Main m1 = new Main();
-            m1.tipo = aux.get(0);
-            m1.naosei = aux.get(1);
-            m1.server = aux.get(2);
-            m1.ftp = aux.get(3);
-            m1.tamanho = aux.get(4);
-            m1.mes = aux.get(5);
-            m1.dia = aux.get(6);
-            m1.hora = aux.get(7);
-            m1.nomeArq = aux.get(8);
-            // System.out.println (aux);
-            dadosArq.add(m1);
-        }
-        return dadosArq;
-    }
-
-    public static void sincroniza(ComandosFTP cl, String dirLocal) throws IOException, ParseException {
+    public static void sincroniza(ComandosFTP cl, String dirLocal, String dirRemoto) throws IOException, ParseException {
         ArrayList<String> resp = new ArrayList<>();
         resp = cl.list(resp, "/");
-        ArrayList<Main> dadosArq = getDados(resp);
+        ArrayList<Remoto> dadosArqRemoto = Remoto.getDadosRemoto(resp);
 
-        File diretorio = new File(dirLocal);
-        File fList[] = diretorio.listFiles();
-        ArrayList<String> files = new ArrayList<>(); //só pra poder usar metodo contains
-
-        for (File fList1 : fList) {
-
-            files.add(fList1.getName());
-        }
-//sincroniza local de acordo com remoto
-        for (Main dadosArq1 : dadosArq) {
-            if (files.contains(dadosArq1.nomeArq)) {
-                if (comparaData(dirLocal, dadosArq1.nomeArq, cl) == 2) {
-                    cl.receive(dirLocal, dadosArq1.nomeArq);
-                    mudaData(dirLocal, dadosArq1.nomeArq, cl);
-                }
-            } else {
-                cl.receive(dirLocal, dadosArq1.nomeArq);
-                mudaData(dirLocal, dadosArq1.nomeArq, cl);
-            }
-        }
+        ArrayList<Local> filesLocal = new ArrayList<>(); 
+        filesLocal = Local.getDadosLocal(dirLocal);
 
         ArrayList<String> auxRemoto = new ArrayList<>();
-        for (Main m2 : dadosArq) {
-            auxRemoto.add(m2.nomeArq);
+        for (Remoto m1 : dadosArqRemoto) {
+            auxRemoto.add(m1.nomeArq);
+        }
+        
+        ArrayList<String> auxLocal = new ArrayList<>();
+        for (Local m2 : filesLocal) {
+            auxLocal.add(m2.nomeArq);
         }
         //sincroniza remoto de acordo com local
-        for (String nome : files) {
-            if (auxRemoto.contains(nome)) {
-                if (comparaData(dirLocal, nome, cl) == 1) {
-                    cl.send(dirLocal, nome);
+        for (String aux : auxLocal) {
+            if (auxRemoto.contains(aux)) {
+                if (comparaData(dirLocal, aux, cl) == 1) {
+                    cl.send(dirLocal, aux);
                 }
             } else {
-                cl.send(dirLocal, nome);
+                cl.send(dirLocal, aux);
             }
         }
+
+//sincroniza local de acordo com remoto
+        for (String dadosArq1 : auxRemoto) {
+            if (auxLocal.contains(dadosArq1)) {
+                if (comparaData(dirLocal, dadosArq1, cl) == 2) {
+                    cl.receive(dirLocal, dadosArq1);
+                    mudaData(dirLocal, dadosArq1, cl);  //tentar unir os 2 laços
+                }
+            } else {
+                cl.receive(dirLocal, dadosArq1);
+                mudaData(dirLocal, dadosArq1, cl);
+            }
+        }
+
     }
 
     public static void mudaData(String pasta, String arq, ComandosFTP cl) throws ParseException, IOException {
@@ -130,6 +92,28 @@ public class Main {
         return resp;
     }
 
+    static int indentLevel = -1;
+
+    public static void listPath(File path) {
+        File files[];
+        indentLevel++;
+        files = path.listFiles();
+        Arrays.sort(files);
+        for (int i = 0, n = files.length; i < n; i++) {
+            for (int indent = 0; indent < indentLevel; indent++) {
+                System.out.print("  ");
+            }
+            if (files[i].isDirectory()) {
+                listPath(files[i]);
+                System.out.println("Pasta: " + files[i].getName());
+            }
+            if (files[i].isFile()) {
+                System.out.println("Arquivo: " + files[i].getName());
+            }
+        }
+        indentLevel--;
+    }
+
     public static void main(String[] args) throws IOException, InterruptedException, ParseException {
         File f = new File("entradas.txt");
         InputStream is = new FileInputStream(f);
@@ -146,8 +130,12 @@ public class Main {
         cl.connect(host, porta);
         cl.login(usuario, senha);
 
+        File teste = new File(dirLocal);
+
+        listPath(teste);
+
         while (true) {
-            sincroniza(cl, dirLocal);
+            sincroniza(cl, dirLocal, dirRemoto);
             Thread.sleep(intervalo * 1000);
         }
     }
