@@ -87,18 +87,20 @@ public class ComandosFTP {
         this.osDados = dados.getOutputStream();
     }
 
-    public ArrayList<String> list(ArrayList<String> lista, String pasta) throws IOException {  //mandar arquivo
+    public ArrayList<String> list(String pasta) throws IOException {  //mandar arquivo
         this.pasv();
         String msg = "LIST " + pasta + "\r\n";
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         this.getCntrlResp();
 
+        ArrayList<String> lista = new ArrayList<>();
+        
         BufferedReader br = new BufferedReader(new InputStreamReader(isDados));
         //String resp = "";
         String line;
         while ((line = br.readLine()) != null) {
             lista.add(line);
-            //resp = resp + "\n" + line;
+           
             System.out.println(line);
         }
         osDados.flush();
@@ -108,13 +110,16 @@ public class ComandosFTP {
         return lista;
     }
 
-    public void send(String dir, String arq) throws IOException {  //mandar arquivo
+    public void send(String dir,String dirLocal, String arq) throws IOException{  //mandar arquivo  //dirRemoto só sera usado no caso da pastas
+        this.changeDir(dir);
         this.pasv();
         String msg = "STOR " + arq + "\r\n";
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         this.getCntrlResp();
-
-        FileInputStream fos = new FileInputStream(dir + arq);
+        
+       //System.out.println("remotototototoot"+dirLocal);
+      //Thread.sleep(10000);
+        FileInputStream fos = new FileInputStream(dirLocal+"/"+arq);
         int umByte = 0;
         while ((umByte = fos.read()) != -1) {
             osDados.write(umByte);
@@ -122,24 +127,47 @@ public class ComandosFTP {
         osDados.flush();
         osDados.close();
         isDados.close();
+        
+        this.changeDir("/");
         this.getCntrlResp();
     }
     
-    public void receive(String pasta, String arq) throws IOException, ParseException {  //mandar arquivo
+ /*   public void receive(String pasta, String dir,String arq) throws IOException, ParseException {  //mandar arquivo
+        this.changeDir(dir);
         this.pasv();
+       
         String msg = "RETR " + arq + "\r\n";
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         this.getCntrlResp();
-        osDados = (new FileOutputStream(new File(pasta + arq)));
+        osDados = (new FileOutputStream(new File(pasta + dir+"/"+arq)));
 
         byte[] buffer = new byte[4096];
         int umByte = 0;
         while ((umByte= isDados.read(buffer)) != -1) {
             osDados.write(buffer, 0, umByte);
         }
+        this.changeDir("/");
         osDados.flush();
         osDados.close();
         isDados.close();
+        
+        this.getCntrlResp();
+    }*/
+    
+      public void receive(String pasta, String dir,String arq) throws IOException {  //mandar arquivo
+        this.changeDir(dir);
+        this.pasv();
+        String msg = "RETR " + arq + "\r\n";
+        this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
+        this.getCntrlResp();
+
+        FileOutputStream fos = new FileOutputStream(pasta+dir+"/"+arq);
+        int umByte = 0;
+        while ((umByte = isDados.read()) != -1) {
+            fos.write(umByte);
+        }
+        //if resp == timeout, reconecte
+        this.changeDir("/");
         this.getCntrlResp();
     }
 
@@ -156,4 +184,14 @@ public class ComandosFTP {
         String resp = this.getCntrlResp();
         return resp;
     }
+    
+    
+  public String back() throws IOException {  //mandar arquivo
+        String msg = "CDUP" + "\r\n";
+        this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
+        String resp = this.getCntrlResp();
+        return resp;
+    }
 }
+
+ 

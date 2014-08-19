@@ -4,4 +4,4 @@ ftp.xpg.com.br
 sd0907
 teste01
 /local/
-/local/
+/

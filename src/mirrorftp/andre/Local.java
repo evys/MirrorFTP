@@ -21,7 +21,7 @@ public class Local {
 
     public String nomeArq;
     public String tipo;
-
+/*
     public static ArrayList<Local> getDadosLocal(String dirLocal) {
         File diretorio = new File(dirLocal);
         File fList[] = diretorio.listFiles();
@@ -35,27 +35,36 @@ public class Local {
             } else {
                 l1.tipo = "arquivo";
             }
-            
+
             files.add(l1);
         }
-    return files;}
-    
-     public static void mudaData(String pasta, String arq, ComandosFTP cl) throws ParseException, IOException {
-        File fi = new File(pasta + arq);
+        return files;
+    }*/
 
+    public static void mudaData(String pasta,String arq, ComandosFTP cl) throws ParseException, IOException, InterruptedException {
+        File fi = new File(Main.dirLocal+pasta+"/"+arq);
+        System.out.println ("pastaaa: "+ pasta);
+       // Thread.sleep(10000);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmSS");
+        cl.changeDir(pasta);
+        System.out.println ("Arq mudadata: "+arq);
+        cl.actDir();
+        System.out.println ("DAAT: "+cl.modificationTime(arq).replace("213 ", ""));
         String dat = cl.modificationTime(arq).replace("213 ", "");
         java.util.Date data = sdf.parse(dat);
 
         long x = data.getTime();
         fi.setLastModified(x);
+        cl.changeDir("/");
+        System.out.println ("cheguei vivo ate aqui");
     }
 
-    public static int comparaData(String pasta, String arq, ComandosFTP cl) throws IOException {
-        File f = new File(pasta + arq);
+    public static int comparaData(String dirLocal, String pasta, String arq, ComandosFTP cl) throws IOException {
+        File f = new File(dirLocal+pasta + arq);
+        cl.changeDir(pasta);
         String aux = cl.modificationTime(arq).replace("213 ", "");
         long remoto = Long.parseLong(aux);
-
+        cl.changeDir("/");
         DateFormat formatData = new SimpleDateFormat("yyyyMMddHHmmSS");
         String data = formatData.format(new Date(f.lastModified()));
         long local = Long.parseLong(data);
@@ -71,6 +80,5 @@ public class Local {
         }
         return resp;
     }
-
 
 }

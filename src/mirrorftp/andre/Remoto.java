@@ -5,7 +5,10 @@
  */
 package mirrorftp.andre;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 /**
@@ -46,4 +49,36 @@ public class Remoto {
         }
         return dadosArq;
     }
+    
+     
+    static int indentLevel = -1;
+
+    public static ArrayList<Remoto> listTest(String dirRemoto, ComandosFTP cl) throws IOException {
+        cl.list (dirRemoto);
+    
+        ArrayList <String> aux = cl.list(dirRemoto);
+        ArrayList <Remoto> files = Remoto.getDadosRemoto(aux);
+        ArrayList <Remoto> result = new ArrayList<>();
+        indentLevel++;
+       Remoto r1 ;
+        for (int i = 0, n = files.size(); i < n; i++) {
+            for (int indent = 0; indent < indentLevel; indent++) {
+                System.out.print("  ");
+            }
+            r1 = files.get(i);
+            if (r1.tipo.equals("drwxr-xr-x")) {
+                listTest(r1.nomeArq, cl);
+                //System.out.println("Pasta: " + r1.nomeArq);
+                result.add(r1);
+            }
+            if (r1.tipo.equals("-rw-r--r--")) {
+               // System.out.println("Arquivo: " + r1.nomeArq);
+                result.add(r1);
+            }
+        }
+        indentLevel--;
+    return result;}
 }
+
+
+
