@@ -15,6 +15,11 @@ import java.util.*;
  */
 public class Main {
 
+    static String usuario;
+    static String host;
+    static String senha;
+    static int porta;
+
     static String dirLocal;
     static String dirRemoto;
 
@@ -58,10 +63,10 @@ public class Main {
                 // System.out.println("DIR ANT:  " + dirAnt);
                 if (auxRemoto.contains(files[i].getName())) {
                     if (Local.comparaData(dirLocal, acumulaDir, files[i].getName(), cl) == 1) {
-                    cl.send(dirAnt, dirLocal + dirAnt, files[i].getName());
+                        cl.send(dirAnt, dirLocal + dirAnt, files[i].getName());
                     }
                 } else {
-                   cl.send(dirAnt, dirLocal + dirAnt, files[i].getName());
+                    cl.send(dirAnt, dirLocal + dirAnt, files[i].getName());
                 }
             }
         }
@@ -95,15 +100,15 @@ public class Main {
                 // System.out.println("Arquivo: " + r1.nomeArq);
                 File fileAux = new File(dirLocal + dirAnt + "/" + r1.nomeArq);
                 if (!fileAux.exists()) {
-                      
+
                     cl.receive(dirLocal, dirAnt, r1.nomeArq);
-                   
+
                     Local.mudaData(dirAnt, r1.nomeArq, cl);
                 } else {
                     if (Local.comparaData(dirLocal, dirAnt, r1.nomeArq, cl) == 2) {
-                    
+
                         cl.receive(dirLocal, dirAnt, r1.nomeArq);
-                 
+
                         Local.mudaData(dirAnt, r1.nomeArq, cl);
                     }
                 }
@@ -124,11 +129,11 @@ public class Main {
         File f = new File("entradas.txt");
         InputStream is = new FileInputStream(f);
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        String host = br.readLine();
-        int porta = new Integer(br.readLine());
+        host = br.readLine();
+        porta = new Integer(br.readLine());
         int intervalo = new Integer(br.readLine());
-        String usuario = br.readLine();
-        String senha = br.readLine();
+        usuario = br.readLine();
+        senha = br.readLine();
         dirLocal = br.readLine();
         dirRemoto = br.readLine();
 
@@ -137,7 +142,9 @@ public class Main {
         cl.login(usuario, senha);
 
         File y = new File(dirLocal);
-   
+        
+    
+        
         while (true) {
             sincroniza2(y, cl, dirLocal, dirRemoto);
             Thread.sleep(intervalo * 1000);

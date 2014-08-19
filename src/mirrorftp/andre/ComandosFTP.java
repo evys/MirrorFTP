@@ -71,6 +71,13 @@ public class ComandosFTP {
         String msg = "PASV \r\n"; //manda servidor escutar numa porta
         this.osContr.write(msg.getBytes());
         String resp = getCntrlResp(); //pegar resposta com a porta do servidor
+        
+/*        if (resp.equals("421 Idle timeout (90 seconds): closing control connection")){
+            System.out.println("Entrei aqui gente rsrs");
+         this.connect(Main.host,Main.porta);
+        this.login(Main.usuario,Main.senha);
+        }*/
+        
         //Entering Passive Mode (187,17,122,141,198,107). as 4 primeiras são o IP, as 2 ultimas calculamos a porta (198*256+107)
         StringTokenizer st = new StringTokenizer(resp);
         st.nextToken("(");
@@ -166,27 +173,37 @@ public class ComandosFTP {
         while ((umByte = isDados.read()) != -1) {
             fos.write(umByte);
         }
-        //if resp == timeout, reconecte
+         this.getCntrlResp();      
+        /*if (this.getCntrlResp().equals("421 Idle timeout (90 seconds): closing control connection")){
+            System.out.println("Entrei aqui gente rsrs");
+         this.connect(Main.host,Main.porta);
+        this.login(Main.usuario,Main.senha);
+        }*/
         this.changeDir("/");
-        this.getCntrlResp();
     }
 
-    public void delete(String arq) throws IOException {  //mandar arquivo
+    public void delete(String arq) throws IOException {  
         String msg = "DELE " + arq + "\r\n";
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         this.getCntrlResp();
 
     }
 
-    public String modificationTime(String arq) throws IOException {  //mandar arquivo
+    public String modificationTime(String arq) throws IOException {  
         String msg = "MDTM " + arq + "\r\n";
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         String resp = this.getCntrlResp();
+        
+        /*if (resp.equals("421 Idle timeout (90 seconds): closing control connection")){
+            System.out.println("Entrei aqui gente rsrs");
+         this.connect(Main.host,Main.porta);
+        this.login(Main.usuario,Main.senha);
+        }*/
         return resp;
     }
     
     
-  public String back() throws IOException {  //mandar arquivo
+  public String back() throws IOException {
         String msg = "CDUP" + "\r\n";
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         String resp = this.getCntrlResp();

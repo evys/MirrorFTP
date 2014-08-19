@@ -48,15 +48,15 @@ public class Local {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmSS");
         cl.changeDir(pasta);
         System.out.println ("Arq mudadata: "+arq);
-        cl.actDir();
-        System.out.println ("DAAT: "+cl.modificationTime(arq).replace("213 ", ""));
+        //cl.actDir();
+        //System.out.println ("DAAT: "+cl.modificationTime(arq).replace("213 ", ""));
         String dat = cl.modificationTime(arq).replace("213 ", "");
         java.util.Date data = sdf.parse(dat);
 
         long x = data.getTime();
         fi.setLastModified(x);
         cl.changeDir("/");
-        System.out.println ("cheguei vivo ate aqui");
+        //System.out.println ("cheguei vivo ate aqui");
     }
 
     public static int comparaData(String dirLocal, String pasta, String arq, ComandosFTP cl) throws IOException {

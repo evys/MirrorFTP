@@ -45,6 +45,7 @@ public class Remoto {
             m1.dia = aux.get(6);
             m1.hora = aux.get(7);
             m1.nomeArq = aux.get(8);
+            m1.nomeArq = linha.substring(55, linha.length());
             dadosArq.add(m1);
         }
         return dadosArq;
