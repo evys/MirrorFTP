@@ -72,13 +72,16 @@ public class ComandosFTP {
         this.osContr.write(msg.getBytes());
         String resp = getCntrlResp(); //pegar resposta com a porta do servidor
         
-/*        if (resp.equals("421 Idle timeout (90 seconds): closing control connection")){
+       if (resp==null){
             System.out.println("Entrei aqui gente rsrs");
          this.connect(Main.host,Main.porta);
         this.login(Main.usuario,Main.senha);
-        }*/
+        this.osContr.write(msg.getBytes());
+        resp=this.getCntrlResp();
+        }
         
         //Entering Passive Mode (187,17,122,141,198,107). as 4 primeiras são o IP, as 2 ultimas calculamos a porta (198*256+107)
+        System.out.println ("Resp: "+ resp);
         StringTokenizer st = new StringTokenizer(resp);
         st.nextToken("(");
         String ip = st.nextToken(",").substring(1) + "."
@@ -123,9 +126,7 @@ public class ComandosFTP {
         String msg = "STOR " + arq + "\r\n";
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         this.getCntrlResp();
-        
-       //System.out.println("remotototototoot"+dirLocal);
-      //Thread.sleep(10000);
+      
         FileInputStream fos = new FileInputStream(dirLocal+"/"+arq);
         int umByte = 0;
         while ((umByte = fos.read()) != -1) {
@@ -138,28 +139,6 @@ public class ComandosFTP {
         this.changeDir("/");
         this.getCntrlResp();
     }
-    
- /*   public void receive(String pasta, String dir,String arq) throws IOException, ParseException {  //mandar arquivo
-        this.changeDir(dir);
-        this.pasv();
-       
-        String msg = "RETR " + arq + "\r\n";
-        this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
-        this.getCntrlResp();
-        osDados = (new FileOutputStream(new File(pasta + dir+"/"+arq)));
-
-        byte[] buffer = new byte[4096];
-        int umByte = 0;
-        while ((umByte= isDados.read(buffer)) != -1) {
-            osDados.write(buffer, 0, umByte);
-        }
-        this.changeDir("/");
-        osDados.flush();
-        osDados.close();
-        isDados.close();
-        
-        this.getCntrlResp();
-    }*/
     
       public void receive(String pasta, String dir,String arq) throws IOException {  //mandar arquivo
         this.changeDir(dir);
@@ -179,6 +158,9 @@ public class ComandosFTP {
          this.connect(Main.host,Main.porta);
         this.login(Main.usuario,Main.senha);
         }*/
+        osDados.flush();
+        osDados.close();
+        isDados.close();
         this.changeDir("/");
     }
 
@@ -194,11 +176,13 @@ public class ComandosFTP {
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         String resp = this.getCntrlResp();
         
-        /*if (resp.equals("421 Idle timeout (90 seconds): closing control connection")){
-            System.out.println("Entrei aqui gente rsrs");
+       if (resp==null){
+            //System.out.println("Entrei aqui gente rsrs");
          this.connect(Main.host,Main.porta);
         this.login(Main.usuario,Main.senha);
-        }*/
+        this.osContr.write(msg.getBytes());
+        resp = this.getCntrlResp();
+        }
         return resp;
     }
     

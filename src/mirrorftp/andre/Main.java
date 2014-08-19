@@ -63,6 +63,7 @@ public class Main {
                 // System.out.println("DIR ANT:  " + dirAnt);
                 if (auxRemoto.contains(files[i].getName())) {
                     if (Local.comparaData(dirLocal, acumulaDir, files[i].getName(), cl) == 1) {
+                        System.out.println ("ENVIANDO "+ Local.comparaData(dirLocal, dirAnt, files[i].getName(), cl));
                         cl.send(dirAnt, dirLocal + dirAnt, files[i].getName());
                     }
                 } else {
@@ -106,7 +107,7 @@ public class Main {
                     Local.mudaData(dirAnt, r1.nomeArq, cl);
                 } else {
                     if (Local.comparaData(dirLocal, dirAnt, r1.nomeArq, cl) == 2) {
-
+                     //  System.out.println ("Recebendoooo "+ Local.comparaData(dirLocal, dirAnt, r1.nomeArq, cl));
                         cl.receive(dirLocal, dirAnt, r1.nomeArq);
 
                         Local.mudaData(dirAnt, r1.nomeArq, cl);
@@ -147,7 +148,7 @@ public class Main {
         
         while (true) {
             sincroniza2(y, cl, dirLocal, dirRemoto);
-            Thread.sleep(intervalo * 1000);
+         //   Thread.sleep(intervalo * 1000);
         }
     }
 

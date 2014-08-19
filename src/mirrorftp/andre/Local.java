@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -19,35 +18,13 @@ import java.util.Date;
  */
 public class Local {
 
-    public String nomeArq;
-    public String tipo;
-/*
-    public static ArrayList<Local> getDadosLocal(String dirLocal) {
-        File diretorio = new File(dirLocal);
-        File fList[] = diretorio.listFiles();
-        ArrayList<Local> files = new ArrayList<>(); //só pra poder usar metodo contains
-
-        for (File fList1 : fList) {
-            Local l1 = new Local();
-            l1.nomeArq = fList1.getName();
-            if (fList1.isDirectory()) {
-                l1.tipo = "pasta";
-            } else {
-                l1.tipo = "arquivo";
-            }
-
-            files.add(l1);
-        }
-        return files;
-    }*/
-
     public static void mudaData(String pasta,String arq, ComandosFTP cl) throws ParseException, IOException, InterruptedException {
         File fi = new File(Main.dirLocal+pasta+"/"+arq);
-        System.out.println ("pastaaa: "+ pasta);
+        //System.out.println ("pastaaa: "+ pasta);
        // Thread.sleep(10000);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmSS");
         cl.changeDir(pasta);
-        System.out.println ("Arq mudadata: "+arq);
+       // System.out.println ("Arq mudadata: "+arq);
         //cl.actDir();
         //System.out.println ("DAAT: "+cl.modificationTime(arq).replace("213 ", ""));
         String dat = cl.modificationTime(arq).replace("213 ", "");
@@ -60,7 +37,8 @@ public class Local {
     }
 
     public static int comparaData(String dirLocal, String pasta, String arq, ComandosFTP cl) throws IOException {
-        File f = new File(dirLocal+pasta + arq);
+        File f = new File(dirLocal+pasta+"/" + arq);
+       // System.out.println("testando compara data"+dirLocal+pasta + arq);
         cl.changeDir(pasta);
         String aux = cl.modificationTime(arq).replace("213 ", "");
         long remoto = Long.parseLong(aux);
