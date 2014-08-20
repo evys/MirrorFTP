@@ -176,18 +176,18 @@ public class ComandosFTP {
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         String resp = this.getCntrlResp();
         
-       if (resp==null){
+      /* if (resp==null){
             //System.out.println("Entrei aqui gente rsrs");
          this.connect(Main.host,Main.porta);
         this.login(Main.usuario,Main.senha);
         this.osContr.write(msg.getBytes());
         resp = this.getCntrlResp();
-        }
+        }*/
         return resp;
     }
     
     
-  public String back() throws IOException {
+    public String back() throws IOException {
         String msg = "CDUP" + "\r\n";
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         String resp = this.getCntrlResp();
