@@ -24,17 +24,19 @@ public class Main {
     static String dirRemoto;
 
     static int indentLevel = -1;
-    static String acumulaDir = "";
+    static String acumulaDir1 = "";
 
     static int indentLevel1 = -1;
-    static String acumulaDir1 = "";
+    static String acumulaDir2= "";
 
     public static void criaDiretorio(String dirLocal, String novoDiretorio) {
         File x = new File(dirLocal + novoDiretorio);
         x.mkdir();
     }
 
-    public static void sincroniza(File path, ComandosFTP cl, String dirLocal, String dirRemoto) throws IOException, ParseException {
+    
+    //reveer esse metodo
+    public static void sincroniza1(File path, ComandosFTP cl, String dirLocal, String dirRemoto) throws IOException, ParseException {
         ArrayList<Remoto> dadosArqRemoto = Remoto.listTest("/", cl);
         ArrayList<String> auxRemoto = new ArrayList<>();
         for (Remoto m1 : dadosArqRemoto) {
@@ -43,26 +45,26 @@ public class Main {
         File files[];
         indentLevel++;
         files = path.listFiles();
-        // Arrays.sort(files);
-        String dirAnt = acumulaDir;
+        Arrays.sort(files);
+        String dirAnt = acumulaDir1;
         for (int i = 0, n = files.length; i < n; i++) {
             for (int indent = 0; indent < indentLevel; indent++) {
                 //System.out.print("  ");
             }
             if (files[i].isDirectory()) {
-                dirAnt = acumulaDir;
-                acumulaDir = acumulaDir + "/" + files[i].getName();
+                dirAnt = acumulaDir1;
+                acumulaDir1 = acumulaDir1 + "/" + files[i].getName();
                 if (!auxRemoto.contains(files[i].getName())) {
                     //System.out.println(acumulaDir);
-                    cl.createDir(acumulaDir);
+                    cl.createDir(acumulaDir1);
                 }
-                sincroniza(files[i], cl, dirLocal, dirRemoto);
+                sincroniza1(files[i], cl, dirLocal, dirRemoto);
                 // System.out.println("Pasta: " + files[i].getName());
             }
             if (files[i].isFile()) { //enviar
                 // System.out.println("DIR ANT:  " + dirAnt);
                 if (auxRemoto.contains(files[i].getName())) {
-                    if (Local.comparaData(dirLocal, acumulaDir, files[i].getName(), cl) == 1) {
+                    if (Local.comparaData(dirLocal, acumulaDir1, files[i].getName(), cl) == 1) {
                         System.out.println ("ENVIANDO "+ Local.comparaData(dirLocal, dirAnt, files[i].getName(), cl));
                         cl.send(dirAnt, dirLocal + dirAnt, files[i].getName());
                     }
@@ -71,30 +73,30 @@ public class Main {
                 }
             }
         }
-        acumulaDir = "";
+        acumulaDir1 = "";
         indentLevel--;
 
     }
 
-    public static void sincroniza1(ComandosFTP cl, String dirLocal, String dirRemoto) throws IOException, ParseException, InterruptedException {
+    public static void sincroniza2(ComandosFTP cl, String dirLocal, String dirRemoto) throws IOException, ParseException, InterruptedException {
 
         ArrayList<String> aux = cl.list(dirRemoto);
         ArrayList<Remoto> files = Remoto.getDadosRemoto(aux);
 
         indentLevel++;
         Remoto r1;
-        String dirAnt = acumulaDir1;
+        String dirAnt = acumulaDir2;
         for (int i = 0, n = files.size(); i < n; i++) {
             for (int indent = 0; indent < indentLevel; indent++) {
                 System.out.print("  ");
             }
             r1 = files.get(i);
             if (r1.tipo.equals("drwxr-xr-x")) {
-                dirAnt = acumulaDir1;
+                dirAnt = acumulaDir2;
                 // System.out.println("DIR ANTEEEEEE: " + dirAnt);
                 acumulaDir1 = acumulaDir1 + "/" + r1.nomeArq;
-                criaDiretorio(dirLocal, acumulaDir1);
-                sincroniza1(cl, dirLocal, acumulaDir1);
+                criaDiretorio(dirLocal, acumulaDir2);
+                sincroniza2(cl, dirLocal, acumulaDir2);
                 System.out.println("Pasta: " + r1.nomeArq);
             }
             if (r1.tipo.equals("-rw-r--r--")) {
@@ -121,9 +123,9 @@ public class Main {
 
     }
 
-    public static void sincroniza2(File path, ComandosFTP cl, String dirLocal, String dirRemoto) throws IOException, ParseException, InterruptedException {
-        sincroniza(path, cl, dirLocal, dirRemoto);
-        sincroniza1(cl, dirLocal, dirRemoto);
+    public static void sincroniza(File path, ComandosFTP cl, String dirLocal, String dirRemoto) throws IOException, ParseException, InterruptedException {
+        sincroniza1(path, cl, dirLocal, dirRemoto);
+        sincroniza2(cl, dirLocal, dirRemoto);
     }
 
     public static void main(String[] args) throws IOException, InterruptedException, ParseException {
@@ -144,12 +146,12 @@ public class Main {
 
         File y = new File(dirLocal);
         
-    
+     sincroniza(y, cl, dirLocal, dirRemoto);
         
-        while (true) {
-            sincroniza2(y, cl, dirLocal, dirRemoto);
+       // while (true) {
+        //    sincroniza(y, cl, dirLocal, dirRemoto);
          //   Thread.sleep(intervalo * 1000);
-        }
+       // }
     }
 
 }

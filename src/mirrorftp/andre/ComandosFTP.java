@@ -72,13 +72,13 @@ public class ComandosFTP {
         this.osContr.write(msg.getBytes());
         String resp = getCntrlResp(); //pegar resposta com a porta do servidor
         
-       if (resp==null){
+       /*if (resp==null){
             System.out.println("Entrei aqui gente rsrs");
          this.connect(Main.host,Main.porta);
         this.login(Main.usuario,Main.senha);
         this.osContr.write(msg.getBytes());
         resp=this.getCntrlResp();
-        }
+        }*/
         
         //Entering Passive Mode (187,17,122,141,198,107). as 4 primeiras são o IP, as 2 ultimas calculamos a porta (198*256+107)
         System.out.println ("Resp: "+ resp);
@@ -106,7 +106,7 @@ public class ComandosFTP {
         ArrayList<String> lista = new ArrayList<>();
         
         BufferedReader br = new BufferedReader(new InputStreamReader(isDados));
-        //String resp = "";
+     
         String line;
         while ((line = br.readLine()) != null) {
             lista.add(line);
@@ -135,9 +135,9 @@ public class ComandosFTP {
         osDados.flush();
         osDados.close();
         isDados.close();
-        
-        this.changeDir("/");
+               
         this.getCntrlResp();
+        this.changeDir("/");
     }
     
       public void receive(String pasta, String dir,String arq) throws IOException {  //mandar arquivo
