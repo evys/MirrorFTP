@@ -38,14 +38,23 @@ public class Local {
 
     public static int comparaData(String dirLocal, String pasta, String arq, ComandosFTP cl) throws IOException {
         File f = new File(dirLocal + pasta + "/" + arq);
-        // System.out.println("testando compara data"+dirLocal+pasta + arq);
+        System.out.println("testando compara data"+dirLocal+pasta +"/"+ arq);
         cl.changeDir(pasta);
+        
+        DateFormat formatData = new SimpleDateFormat("yyyyMMddHHmmss");
+        
         String aux = cl.modificationTime(arq).replace("213 ", "");
         long remoto = Long.parseLong(aux);
-        cl.changeDir("/");
-        DateFormat formatData = new SimpleDateFormat("yyyyMMddHHmmSS");
+        //aux= formatData.format(new Date (remoto));
+        remoto = Long.parseLong(aux);
+        cl.changeDir(Main.dirRemoto);
+        
+        
         String data = formatData.format(new Date(f.lastModified()));
         long local = Long.parseLong(data);
+        
+        
+        //System.out.println ("Long local "+local+"  Long remoto "+remoto);
         int resp = -1;
         if (local == remoto) {
             resp = 0;

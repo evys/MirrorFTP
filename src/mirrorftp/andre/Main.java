@@ -35,100 +35,94 @@ public class Main {
     }
 
     //reveer esse metodo
-    public static void sincroniza1(ArrayList<String> auxRemoto, File path, ComandosFTP cl, String dirLocal, String dirRemoto) throws IOException, ParseException {
-        /* ArrayList<Remoto> dadosArqRemoto = Remoto.listTest("/", cl);
-         ArrayList<String> auxRemoto = new ArrayList<>();
-         for (Remoto m1 : dadosArqRemoto) {
-         auxRemoto.add(m1.nomeArq);
-         }*/
+    public static void sincroniza1(File path, ComandosFTP cl, String dirLocal, String dirRemoto) throws IOException, ParseException {
+        ArrayList<Remoto> dadosArqRemoto = Remoto.listRemoto(acumulaDir1, cl);
+        ArrayList<String> auxRemoto = new ArrayList<>();
+        for (int x = 0; x < dadosArqRemoto.size(); x++) {
+            Remoto r1 = dadosArqRemoto.get(x);
+            auxRemoto.add(r1.nomeArq);
+        }
+
         File files[];
-        indentLevel++;
         files = path.listFiles();
         Arrays.sort(files);
-        String dirAnt = acumulaDir1;
+
         for (int i = 0, n = files.length; i < n; i++) {
-            for (int indent = 0; indent < indentLevel; indent++) {
-                //System.out.print("  ");
-            }
+
             if (files[i].isDirectory()) {
-                dirAnt = acumulaDir1;
+
                 acumulaDir1 = acumulaDir1 + "/" + files[i].getName();
+
                 if (!auxRemoto.contains(files[i].getName())) {
-                    //System.out.println(acumulaDir);
-                    cl.createDir(acumulaDir1);
+                    cl.createDir(files[i].getParent().replace("\\", "/").replace("/" + Main.dirLocal.replace("/", ""), "") + "/" + files[i].getName());
                 }
-                sincroniza1(auxRemoto, files[i], cl, dirLocal, dirRemoto);
-                // System.out.println("Pasta: " + files[i].getName());
+                sincroniza1(files[i], cl, dirLocal, dirRemoto);
             }
             if (files[i].isFile()) { //enviar
-                // System.out.println("DIR ANT:  " + dirAnt);
+                String caminho;
+                caminho = files[i].getParent().replace("C:", "").replace("\\", "/");
+                caminho = caminho.replace("/" + Main.dirLocal.replace("/", ""), "");
+                caminho = caminho.replace(files[i].getName(), "");
+                System.out.println("Caminho " + caminho);
+
                 if (auxRemoto.contains(files[i].getName())) {
-                    if (Local.comparaData(dirLocal, acumulaDir1, files[i].getName(), cl) == 1) {
-                        System.out.println("ENVIANDO " + Local.comparaData(dirLocal, dirAnt, files[i].getName(), cl));
-                        cl.send(dirAnt, dirLocal + dirAnt, files[i].getName());
+                    //System.out.println("VALOR: " + Local.comparaData(dirLocal, caminho, files[i].getName(), cl));
+                    if (Local.comparaData(dirLocal, caminho, files[i].getName(), cl) == 1) {
+
+                        cl.send(caminho, files[i].getName());
                     }
                 } else {
-                    cl.send(dirAnt, dirLocal + dirAnt, files[i].getName());
+                    cl.send(caminho, files[i].getName());
                 }
             }
         }
         acumulaDir1 = "";
-        indentLevel--;
-
     }
 
+    public static String dirAnt = "";
+
     public static void sincroniza2(ComandosFTP cl, String dirLocal, String dirRemoto) throws IOException, ParseException, InterruptedException {
-
         ArrayList<String> aux = cl.list(dirRemoto);
-        ArrayList<Remoto> files = Remoto.getDadosRemoto(aux);
+        ArrayList<Remoto> files = Remoto.listRemoto(dirAnt, cl);
 
-        indentLevel1++;
         Remoto r1;
-        String dirAnt = acumulaDir2;
+
         for (int i = 0, n = files.size(); i < n; i++) {
-            for (int indent = 0; indent < indentLevel1; indent++) {
-                System.out.print("  ");
-            }
             r1 = files.get(i);
             if (r1.tipo.equals("drwxr-xr-x")) {
-                dirAnt = acumulaDir2;
-                // System.out.println("DIR ANTEEEEEE: " + dirAnt);
+                System.out.println("3???" + r1.nomeArq);
+                cl.changeDir(r1.nomeArq);
+                dirAnt = cl.actDir().replace("257 \"", "").replace("\" is the current directory", "");
+                System.out.println("DIR ANTEEEEEE: " + dirAnt);
                 acumulaDir2 = acumulaDir2 + "/" + r1.nomeArq;
-                criaDiretorio(dirLocal, acumulaDir2);
-                sincroniza2(cl, dirLocal, acumulaDir2);
-                System.out.println("Pasta: " + r1.nomeArq);
+                criaDiretorio(dirLocal, dirAnt);
+                sincroniza2(cl, dirLocal, dirAnt);
+                //System.out.println("Pasta: " + r1.nomeArq);
             }
             if (r1.tipo.equals("-rw-r--r--")) {
                 // System.out.println("Arquivo: " + r1.nomeArq);
                 File fileAux = new File(dirLocal + dirAnt + "/" + r1.nomeArq);
                 if (!fileAux.exists()) {
-
                     cl.receive(dirLocal, dirAnt, r1.nomeArq);
-
                     Local.mudaData(dirAnt, r1.nomeArq, cl);
                 } else {
                     if (Local.comparaData(dirLocal, dirAnt, r1.nomeArq, cl) == 2) {
                         //  System.out.println ("Recebendoooo "+ Local.comparaData(dirLocal, dirAnt, r1.nomeArq, cl));
                         cl.receive(dirLocal, dirAnt, r1.nomeArq);
-
                         Local.mudaData(dirAnt, r1.nomeArq, cl);
                     }
                 }
-
             }
         }
+        cl.back();
         acumulaDir2 = "";
         indentLevel1--;
 
     }
 
     public static void sincroniza(File path, ComandosFTP cl, String dirLocal, String dirRemoto) throws IOException, ParseException, InterruptedException {
-        ArrayList<Remoto> dadosArqRemoto = Remoto.listRemoto("/", cl);
-        ArrayList<String> auxRemoto = new ArrayList<>();
-        for (Remoto m1 : dadosArqRemoto) {
-            auxRemoto.add(m1.nomeArq);
-        }
-        sincroniza1(auxRemoto, path, cl, dirLocal, dirRemoto);
+
+        //sincroniza1(path, cl, dirLocal, dirRemoto);
         sincroniza2(cl, dirLocal, dirRemoto);
     }
 
@@ -151,11 +145,11 @@ public class Main {
         File y = new File(dirLocal);
 
         sincroniza(y, cl, dirLocal, dirRemoto);
-
-       // while (true) {
-        //    sincroniza(y, cl, dirLocal, dirRemoto);
-        //   Thread.sleep(intervalo * 1000);
-        // }
+        //cl.Nlist("/hum");
+        /*while (true) {
+         sincroniza(y, cl, dirLocal, dirRemoto);
+         Thread.sleep(intervalo * 1000);
+         }*/
     }
 
 }
