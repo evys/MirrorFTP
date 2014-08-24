@@ -19,11 +19,12 @@ import java.util.Date;
 public class Local {
 
     public static void mudaData(String pasta, String arq, ComandosFTP cl) throws ParseException, IOException, InterruptedException {
-        File fi = new File(Main.dirLocal + pasta + "/" + arq);
+        String aux = Main.dirLocal+ pasta + "/" + arq;
+        File fi = new File(aux.replace("///", "/").replace("//", "/"));
         //System.out.println ("pastaaa: "+ pasta);
         // Thread.sleep(10000);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmSS");
-        cl.changeDir(pasta);
+      //  cl.changeDir(pasta);
         // System.out.println ("Arq mudadata: "+arq);
         //cl.actDir();
         //System.out.println ("DAAT: "+cl.modificationTime(arq).replace("213 ", ""));
@@ -32,11 +33,9 @@ public class Local {
 
         long x = data.getTime();
         fi.setLastModified(x);
-        cl.changeDir("/");
-        //System.out.println ("cheguei vivo ate aqui");
+        
     }
-
-    public static int comparaData(String dirLocal, String pasta, String arq, ComandosFTP cl) throws IOException {
+public static int comparaData(String dirLocal, String pasta, String arq, ComandosFTP cl) throws IOException {
         File f = new File(dirLocal + pasta + "/" + arq);
         System.out.println("testando compara data"+dirLocal+pasta +"/"+ arq);
         cl.changeDir(pasta);
@@ -54,7 +53,40 @@ public class Local {
         long local = Long.parseLong(data);
         
         
-        //System.out.println ("Long local "+local+"  Long remoto "+remoto);
+        System.out.println ("Long local "+local+"  Long remoto "+remoto);
+        int resp = -1;
+        if (local == remoto) {
+            resp = 0;
+        }
+        if (local > remoto) {
+            resp = 1;
+        }
+        if (local < remoto) {
+            resp = 2;
+        }
+        return resp;
+    }
+
+
+//nao preciso fazer as mudanças de pastas quando recebo os arquivos
+    public static int comparaDataReceive(String dirLocal, String pasta, String arq, ComandosFTP cl) throws IOException {
+        File f = new File(dirLocal + pasta + "/" + arq);
+        System.out.println("testando compara data"+dirLocal+pasta +"/"+ arq);
+        //cl.changeDir(pasta);
+        
+        DateFormat formatData = new SimpleDateFormat("yyyyMMddHHmmss");
+        
+        String aux = cl.modificationTime(arq).replace("213 ", "");
+        long remoto = Long.parseLong(aux);
+       
+        remoto = Long.parseLong(aux);
+              
+        
+        String data = formatData.format(new Date(f.lastModified()));
+        long local = Long.parseLong(data);
+        
+        
+        System.out.println ("Long local "+local+"  Long remoto "+remoto);
         int resp = -1;
         if (local == remoto) {
             resp = 0;

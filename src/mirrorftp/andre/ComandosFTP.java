@@ -27,7 +27,7 @@ public class ComandosFTP {
     private String getCntrlResp() throws IOException {  //metodo de captura de resposta
         BufferedReader br = new BufferedReader(new InputStreamReader(this.isContr));//ajuda a encontrar o /n
         String resp = br.readLine(); //devolve os bytes de string ate achar /n
-        // System.out.println(resp);
+        System.out.println(resp);
         return resp;
     }
 
@@ -134,12 +134,12 @@ public class ComandosFTP {
     }
 
     public void receive(String pasta, String dir, String arq) throws IOException {  //mandar arquivo
-        this.changeDir(dir);
+       // this.changeDir(dir);
         this.pasv();
         String msg = "RETR " + arq + "\r\n";
         this.osContr.write(msg.getBytes());//mandar pro servidor via canal de saída
         this.getCntrlResp();
-
+ System.out.println("destino  "+pasta + dir + "/" + arq);
         FileOutputStream fos = new FileOutputStream(pasta + dir + "/" + arq);
         int umByte = 0;
         while ((umByte = isDados.read()) != -1) {
@@ -150,7 +150,7 @@ public class ComandosFTP {
         osDados.flush();
         osDados.close();
         isDados.close();
-        this.changeDir("/");
+       // this.changeDir("/");
     }
 
     public void delete(String arq) throws IOException {
